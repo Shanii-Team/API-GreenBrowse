@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenGrows - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="backoffice.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="logo">
+                <span class="material-icons icon">eco</span>
+                <span class="text">GreenGrows</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active">
+                    <span class="material-icons icon">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="material-icons icon">history</span>
+                    <span>Historique</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="material-icons icon">settings</span>
+                    <span>Paramètres</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Dashboard</h1>
+                <div class="date-range">
+                    <span class="material-icons">date_range</span>
+                    <select id="timeRange">
+                        <option value="today">Aujourd'hui</option>
+                        <option value="week" selected>Cette semaine</option>
+                        <option value="month">Ce mois</option>
+                        <option value="year">Cette année</option>
+                    </select>
+                </div>
+            </header>
+
+            <section class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="material-icons icon">cloud_upload</span>
+                        <h3>Total CO2</h3>
+                    </div>
+                    <div class="stat-value">0.000 g</div>
+                    <div class="stat-trend">
+                        <span class="material-icons">info</span>
+                        <span>Émissions totales</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="material-icons icon">category</span>
+                        <h3>Types de contenu</h3>
+                    </div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-trend">
+                        <span class="material-icons">info</span>
+                        <span>Types différents</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="material-icons icon">memory</span>
+                        <h3>Dernier type</h3>
+                    </div>
+                    <div class="stat-value">-</div>
+                    <div class="stat-trend">
+                        <span class="material-icons">info</span>
+                        <span>Type le plus récent</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="material-icons icon">eco</span>
+                        <h3>Pages Web</h3>
+                    </div>
+                    <div class="stat-value">0%</div>
+                    <div class="stat-trend">
+                        <span class="material-icons">info</span>
+                        <span>% du total</span>
+                    </div>
+                </div>
+            </section>
+
+            <div class="dashboard-content">
+                <div class="left-section">
+                    <div class="charts-section">
+                        <div class="chart-box large">
+                            <canvas id="co2Chart"></canvas>
+                        </div>
+                        <div class="chart-box">
+                            <canvas id="typeChart"></canvas>
+                        </div>
+                        <div class="chart-box">
+                            <canvas id="sitesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="right-section">
+                    <div class="recent-activity">
+                        <h2>Statistiques par type</h2>
+                        <div class="activity-list" id="typeStats">
+                            <!-- Les statistiques par type seront injectées ici par JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="backoffice.js"></script>
+</body>
+</html>
