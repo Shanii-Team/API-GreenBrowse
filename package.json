@@ -1,7 +1,7 @@
 {
-  "name": "greengrows-api",
+  "name": "greenbrowse-api",
   "version": "1.0.0",
-  "description": "API for GreenGrows Chrome extension data",
+  "description": "API for GreenBrowse Chrome extension data",
   "main": "server.js",
   "engines": {
     "node": ">=18.0.0"

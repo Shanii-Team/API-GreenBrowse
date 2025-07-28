@@ -1,6 +1,6 @@
 // Configuration de l'API
 const API_CONFIG = {
-    baseUrl: 'http://127.0.0.1:3001',
+    baseUrl: 'http://3.143.235.117:3001',
     endpoints: {
         co2: '/api/co2',
         stats: '/api/stats'

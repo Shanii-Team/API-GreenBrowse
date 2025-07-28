@@ -29,7 +29,7 @@ npm start
 Le serveur démarre sur `http://127.0.0.1:3001` avec un affichage clair des endpoints disponibles :
 ```
 ================================================================================
-✨ SERVEUR GREENGROWS
+✨ SERVEUR GREENBROWSE
 ================================================================================
 ✅ API démarrée sur http://127.0.0.1:3001
 
