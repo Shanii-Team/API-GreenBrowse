@@ -6,6 +6,12 @@ const app = express();
 const port = 3001; // Port configuré dans le client GreenGrowsAPI
 const host = '141.95.160.10'; // Adresse VPS
 
+// --- CORRECTION SONARQUBE ---
+// Désactive l'en-tête 'X-Powered-By: Express' pour des raisons de sécurité.
+// Cela évite de révéler facilement la technologie utilisée par le serveur (fingerprinting).
+app.disable('x-powered-by');
+// --- FIN CORRECTION ---
+
 // Configuration CORS
 const corsOptions = {
     origin: '*',
@@ -32,7 +38,7 @@ function debugLog(type, message, data = null) {
         case 'request': icon = '📥'; break;
         case 'response': icon = '📤'; break;
     }
-    
+
     console.log('\n' + '-'.repeat(80));
     console.log(`${icon} [DEBUG API ${timestamp}] ${message}`);
     if (data) {
@@ -88,7 +94,7 @@ app.post('/api/co2', (req, res) => {
                 ])
             )
         });
-        
+
         const response = {
             success: true,
             data: {
