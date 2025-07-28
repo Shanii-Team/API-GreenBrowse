@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 
 const app = express();
 const port = 3001; // Port configuré dans le client GreenGrowsAPI
-const host = '127.0.0.1';
+const host = '141.95.160.10'; // Adresse VPS
 
 // Configuration CORS
 const corsOptions = {
