@@ -12,6 +12,7 @@ import AlertThresholds from './AlertThresholds';
 import WaterSavingsCard from './WaterSavingsCard';
 import CO2BreakdownCard from './CO2BreakdownCard';
 import TestDataGenerator from './TestDataGenerator';
+import ConnectionDiagnostic from './ConnectionDiagnostic';
 
 const Dashboard: React.FC = () => {
   const [timeframe, setTimeframe] = useState('month');
@@ -106,6 +107,9 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Connection Diagnostic - Show if there are connection issues */}
+      {(!isConnected || error) && <ConnectionDiagnostic />}
+      
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>

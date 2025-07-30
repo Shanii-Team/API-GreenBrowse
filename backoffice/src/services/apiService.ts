@@ -1,5 +1,7 @@
 // API Service to connect to GreenGrows API
-const API_BASE_URL = 'http://141.95.160.10:3001/api';
+import { apiConfig } from './apiConfig';
+
+const API_BASE_URL = apiConfig.getBaseUrl();
 
 export interface CO2Stats {
   success: boolean;
@@ -53,23 +55,39 @@ export interface UserStats {
 }
 
 class ApiService {
-  private async fetchWithTimeout(url: string, options: RequestInit = {}, timeout = 5000): Promise<Response> {
+  private async fetchWithTimeout(url: string, options: RequestInit = {}, timeout = 10000): Promise<Response> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
     
     try {
+      console.log('🔗 Attempting fetch to:', url);
+      
       const response = await fetch(url, {
         ...options,
         signal: controller.signal,
+        mode: 'cors', // Explicitly set CORS mode
+        cache: 'no-cache',
+        credentials: 'omit', // Don't send credentials
+        referrerPolicy: 'no-referrer',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Origin': window.location.origin,
           ...options.headers,
         },
       });
+      
+      console.log('📡 Response received:', response.status, response.statusText);
       clearTimeout(timeoutId);
       return response;
     } catch (error) {
       clearTimeout(timeoutId);
+      console.error('💥 Fetch error details:', {
+        message: error.message,
+        name: error.name,
+        url: url,
+        stack: error.stack?.split('\n')[0]
+      });
       throw error;
     }
   }

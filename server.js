@@ -29,9 +29,17 @@ app.use(bodyParser.json());
 // Servir les fichiers statiques du backoffice
 app.use('/backoffice', express.static('backoffice/dist'));
 
+// Servir le backoffice simple en HTML
+app.use('/dashboard', express.static('./', { index: 'backoffice-simple.html' }));
+
 // Route pour servir le backoffice (SPA routing)
 app.get('/backoffice/*', (req, res) => {
     res.sendFile(path.join(__dirname, 'backoffice/dist/index.html'));
+});
+
+// Route simple pour dashboard de test
+app.get('/dashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'backoffice-simple.html'));
 });
 
 // Stockage des données multi-utilisateurs
