@@ -4,7 +4,7 @@ import { useCO2Data } from '../hooks/useCO2Data';
 
 const ApiIntegration: React.FC = () => {
   const [syncing, setSyncing] = useState(false);
-  const { data: co2Data, loading, error, isConnected, refresh } = useCO2Data();
+  const { data: co2Data, loading, error, isConnected, hasRealData, refresh } = useCO2Data();
 
   const totalCO2 = co2Data.total || 0;
   const totalCO2Display = totalCO2 < 1 ? `${(totalCO2 * 1000).toFixed(0)} gCO₂e` : `${totalCO2.toFixed(3)} kgCO₂e`;
@@ -13,23 +13,23 @@ const ApiIntegration: React.FC = () => {
     {
       icon: Chrome,
       title: 'Extension Navigateur',
-      status: isConnected ? 'connected' : 'disconnected',
-      value: loading ? 'Loading...' : totalCO2Display,
-      description: 'Mesure en temps réel de l\'empreinte carbone numérique'
+      status: hasRealData ? 'connected' : isConnected ? 'waiting' : 'disconnected',
+      value: loading ? 'Loading...' : hasRealData ? totalCO2Display : 'En attente de données',
+      description: hasRealData ? 'Données reçues de l\'extension' : 'Mesure en temps réel de l\'empreinte carbone numérique'
     },
     {
       icon: Server,
       title: 'API GreenGrows',
       status: isConnected ? 'connected' : 'disconnected',
       value: loading ? 'Loading...' : `${Object.keys(co2Data.details || {}).length} types`,
-      description: 'Serveur API pour collecte de données CO₂'
+      description: isConnected ? 'Serveur API opérationnel' : 'Erreur de connexion au serveur'
     },
     {
       icon: Smartphone,
-      title: 'Données temps réel',
-      status: error ? 'error' : 'active',
-      value: loading ? 'Loading...' : `${Object.values(co2Data.details || {}).length} entrées`,
-      description: error || 'Auto-refresh toutes les 5 secondes'
+      title: 'Application Flutter',
+      status: hasRealData ? 'connected' : isConnected ? 'waiting' : 'disconnected',
+      value: loading ? 'Loading...' : hasRealData ? `${Object.values(co2Data.details || {}).length} entrées` : 'En attente',
+      description: hasRealData ? 'Données reçues de l\'application' : (error || 'Auto-refresh toutes les 5 secondes')
     }
   ];
 
@@ -43,6 +43,8 @@ const ApiIntegration: React.FC = () => {
     switch (status) {
       case 'connected':
         return 'text-emerald-500';
+      case 'waiting':
+        return 'text-amber-500';
       case 'active':
         return 'text-blue-500';
       case 'error':
@@ -58,6 +60,8 @@ const ApiIntegration: React.FC = () => {
     switch (status) {
       case 'connected':
         return <Wifi className="w-4 h-4" />;
+      case 'waiting':
+        return <RefreshCw className="w-4 h-4 animate-pulse" />;
       case 'active':
         return <Wifi className="w-4 h-4" />;
       case 'error':

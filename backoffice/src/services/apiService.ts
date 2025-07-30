@@ -76,23 +76,23 @@ class ApiService {
 
   async getStats(): Promise<CO2Stats> {
     try {
+      console.log('🌐 Making request to:', `${API_BASE_URL}/stats`);
       const response = await this.fetchWithTimeout(`${API_BASE_URL}/stats`);
+      
+      console.log('📡 Response status:', response.status);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      return await response.json();
+      const result = await response.json();
+      console.log('📊 Raw API result:', result);
+      
+      return result;
     } catch (error) {
       console.error('❌ Error fetching CO2 stats:', error);
-      // Return mock data if API is unavailable
-      return {
-        success: false,
-        data: {
-          total: 0,
-          details: {}
-        }
-      };
+      // Return mock data with error indication if API is unavailable
+      throw error; // Let the calling component handle the error
     }
   }
 

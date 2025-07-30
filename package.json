@@ -13,7 +13,12 @@
     "backoffice:dev": "cd backoffice && npm run dev",
     "backoffice:build": "cd backoffice && npm run build",
     "backoffice:serve": "cd backoffice && npm run serve",
-    "dev:all": "concurrently \"npm run dev\" \"npm run backoffice:dev\""
+    "dev:all": "concurrently \"npm run dev\" \"npm run backoffice:dev\"",
+    "deploy": "bash deploy.sh",
+    "build": "cd backoffice && npm install && npm run build",
+    "pm2:start": "pm2 start server.js --name greengrows-api",
+    "pm2:stop": "pm2 stop greengrows-api",
+    "pm2:restart": "pm2 restart greengrows-api"
   },
   "dependencies": {
     "express": "4.18.2",

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenGrows Backoffice - Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin: 10px 10px 10px 0;
+        }
+        .status-connected { background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; }
+        .status-waiting { background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; }
+        .status-error { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; }
+        .button {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .button:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .metric { text-align: center; padding: 20px; }
+        .metric-value { font-size: 2.5em; font-weight: bold; margin: 10px 0; }
+        .loading { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center; font-size: 3em; margin-bottom: 10px;">🌱 GreenGrows</h1>
+        <p style="text-align: center; font-size: 1.2em; opacity: 0.8; margin-bottom: 40px;">Backoffice de suivi des émissions CO₂</p>
+        
+        <div class="card">
+            <h2>📊 État de la connexion API</h2>
+            <div id="connectionStatus">
+                <span class="status-badge status-waiting">🔄 Test de connexion...</span>
+            </div>
+            <p id="apiUrl">URL API: http://141.95.160.10:3001/api</p>
+            <button class="button" onclick="testConnection()">🔄 Tester la connexion</button>
+            <button class="button" onclick="sendTestData()">📊 Envoyer données test</button>
+        </div>
+
+        <div class="card">
+            <h2>📈 Données CO₂ en temps réel</h2>
+            <div class="grid">
+                <div class="metric">
+                    <h3>Total CO₂</h3>
+                    <div class="metric-value" id="totalCO2">--</div>
+                    <div>kgCO₂e</div>
+                </div>
+                <div class="metric">
+                    <h3>Types de données</h3>
+                    <div class="metric-value" id="dataTypes">--</div>
+                    <div>catégories</div>
+                </div>
+                <div class="metric">
+                    <h3>Utilisateurs</h3>
+                    <div class="metric-value" id="totalUsers">--</div>
+                    <div>actifs</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🔧 Actions de test</h2>
+            <p>Utilisez ces boutons pour tester le système :</p>
+            <button class="button" onclick="fetchStats()">📊 Récupérer les stats</button>
+            <button class="button" onclick="fetchUsers()">👥 Lister les utilisateurs</button>
+            <button class="button" onclick="clearData()">🗑️ Effacer les données</button>
+        </div>
+
+        <div class="card">
+            <h2>📝 Logs en temps réel</h2>
+            <div id="logs" style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px; height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;">
+                <div>🚀 Backoffice GreenGrows initialisé</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://141.95.160.10:3001/api';
+        
+        function log(message) {
+            const logs = document.getElementById('logs');
+            const now = new Date().toLocaleTimeString();
+            logs.innerHTML += `<div>[${now}] ${message}</div>`;
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        async function testConnection() {
+            log('🔄 Test de connexion à l\'API...');
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ API connectée: ${data.message}`);
+                    document.getElementById('connectionStatus').innerHTML = 
+                        '<span class="status-badge status-connected">✅ API Connectée</span>';
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                log(`❌ Erreur de connexion: ${error.message}`);
+                document.getElementById('connectionStatus').innerHTML = 
+                    '<span class="status-badge status-error">❌ API Déconnectée</span>';
+            }
+        }
+
+        async function fetchStats() {
+            log('📊 Récupération des statistiques...');
+            try {
+                const response = await fetch(`${API_BASE}/stats`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('totalCO2').textContent = data.data.total.toFixed(3);
+                    document.getElementById('dataTypes').textContent = Object.keys(data.data.details).length;
+                    log(`✅ Stats récupérées: ${data.data.total.toFixed(3)} kgCO₂e`);
+                    
+                    Object.entries(data.data.details).forEach(([type, value]) => {
+                        log(`   📈 ${type}: ${value.toFixed(3)} kgCO₂e`);
+                    });
+                } else {
+                    log('⚠️ Aucune donnée disponible');
+                }
+            } catch (error) {
+                log(`❌ Erreur récupération stats: ${error.message}`);
+            }
+        }
+
+        async function fetchUsers() {
+            log('👥 Récupération des utilisateurs...');
+            try {
+                const response = await fetch(`${API_BASE}/users`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('totalUsers').textContent = data.data.totalUsers;
+                    log(`✅ ${data.data.totalUsers} utilisateur(s) trouvé(s)`);
+                    
+                    data.data.users.forEach(user => {
+                        log(`   👤 ${user.profile.name}: ${user.totalCO2.toFixed(3)} kgCO₂e`);
+                    });
+                } else {
+                    log('⚠️ Aucun utilisateur trouvé');
+                }
+            } catch (error) {
+                log(`❌ Erreur récupération utilisateurs: ${error.message}`);
+            }
+        }
+
+        async function sendTestData() {
+            log('📊 Envoi de données de test...');
+            const testData = [
+                { type: 'webpage', co2: 0.123, userId: 'test-user-1' },
+                { type: 'video', co2: 0.456, userId: 'test-user-2' },
+                { type: 'image', co2: 0.089, userId: 'test-user-1' }
+            ];
+
+            for (const data of testData) {
+                try {
+                    const response = await fetch(`${API_BASE}/co2`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    if (response.ok) {
+                        log(`✅ Données envoyées: ${data.type} - ${data.co2} kgCO₂e (${data.userId})`);
+                    } else {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                } catch (error) {
+                    log(`❌ Erreur envoi: ${error.message}`);
+                }
+            }
+            
+            // Actualiser les stats après envoi
+            setTimeout(fetchStats, 1000);
+            setTimeout(fetchUsers, 1500);
+        }
+
+        // Auto-refresh toutes les 10 secondes
+        setInterval(() => {
+            fetchStats();
+            fetchUsers();
+        }, 10000);
+
+        // Test initial
+        window.onload = () => {
+            setTimeout(testConnection, 500);
+            setTimeout(fetchStats, 1000);
+            setTimeout(fetchUsers, 1500);
+        };
+    </script>
+</body>
+</html>

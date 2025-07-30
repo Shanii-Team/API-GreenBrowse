@@ -11,11 +11,12 @@ import ApiIntegration from './ApiIntegration';
 import AlertThresholds from './AlertThresholds';
 import WaterSavingsCard from './WaterSavingsCard';
 import CO2BreakdownCard from './CO2BreakdownCard';
+import TestDataGenerator from './TestDataGenerator';
 
 const Dashboard: React.FC = () => {
   const [timeframe, setTimeframe] = useState('month');
   const { translate } = useTranslation();
-  const { data: co2Data, loading, error, isConnected } = useCO2Data();
+  const { data: co2Data, loading, error, isConnected, hasRealData } = useCO2Data();
 
   const timeframes = [
     { id: 'today', label: translate('today') },
@@ -24,8 +25,12 @@ const Dashboard: React.FC = () => {
     { id: 'quarter', label: translate('quarter') }
   ];
 
-  const totalCO2 = co2Data.total || 0;
+  // Use real data if available, otherwise demo data
+  const totalCO2 = hasRealData && co2Data.total > 0 ? co2Data.total : 2.847;
   const totalCO2Display = totalCO2 < 1 ? `${(totalCO2 * 1000).toFixed(0)} gCO₂e` : `${totalCO2.toFixed(3)} kgCO₂e`;
+  
+  // Show data source indicator
+  const dataSource = hasRealData ? 'real' : isConnected ? 'empty' : 'demo';
   
   const metrics = [
     {
@@ -103,9 +108,33 @@ const Dashboard: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-          {translate('carbon-dashboard-title')}
-        </h1>
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+            {translate('carbon-dashboard-title')}
+          </h1>
+          <div className="flex items-center gap-2 mt-2">
+            {dataSource === 'real' && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                🟢 Données temps réel
+              </span>
+            )}
+            {dataSource === 'empty' && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                🔵 API connectée - Aucune donnée
+              </span>
+            )}
+            {dataSource === 'demo' && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
+                🟠 Données de démonstration
+              </span>
+            )}
+            {error && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                🔴 {error}
+              </span>
+            )}
+          </div>
+        </div>
         
         <div className="flex bg-white dark:bg-slate-800 rounded-xl p-1 shadow-sm border border-slate-200 dark:border-slate-700">
           {timeframes.map((tf) => (
@@ -176,10 +205,17 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* CO2 Breakdown */}
-      <CO2BreakdownCard details={co2Data.details || {}} total={totalCO2} loading={loading} />
+      <CO2BreakdownCard 
+        details={hasRealData ? co2Data.details || {} : { 'webpage': 1.2, 'video': 0.8, 'image': 0.4, 'script': 0.447 }} 
+        total={totalCO2} 
+        loading={loading} 
+      />
 
       {/* API Integration */}
       <ApiIntegration />
+
+      {/* Test Data Generator - Only show if no real data */}
+      {!hasRealData && <TestDataGenerator />}
 
       {/* Alert Thresholds */}
       <AlertThresholds />

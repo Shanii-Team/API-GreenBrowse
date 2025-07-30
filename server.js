@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const path = require('path');
 
 const app = express();
 const port = 3001; // Port configuré dans le client GreenGrowsAPI
@@ -24,6 +25,14 @@ const corsOptions = {
 // Middleware
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
+
+// Servir les fichiers statiques du backoffice
+app.use('/backoffice', express.static('backoffice/dist'));
+
+// Route pour servir le backoffice (SPA routing)
+app.get('/backoffice/*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'backoffice/dist/index.html'));
+});
 
 // Stockage des données multi-utilisateurs
 // Structure: users[userId] = { totalCO2: number, details: {}, profile: {}, lastActivity: Date }
