@@ -16,7 +16,7 @@ const getApiBaseUrl = (): string => {
   }
   
   // Default to VPS HTTP
-  return 'http://141.95.160.10:3001/api';
+  return 'http://141.95.160.10:3002/api';
 };
 
 const API_BASE_URL = getApiBaseUrl();

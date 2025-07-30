@@ -2,7 +2,7 @@
 const http = require('http');
 
 const API_HOST = '141.95.160.10';
-const API_PORT = 3001;
+const API_PORT = 3002;
 
 console.log('🧪 Test de connectivité API GreenGrows');
 console.log(`📡 Tentative de connexion à http://${API_HOST}:${API_PORT}`);

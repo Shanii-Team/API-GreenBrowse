@@ -18,7 +18,7 @@ export class ApiConfig {
       console.log('🔒 Using HTTPS - Using relative API URL');
     } else {
       // Option 2: Direct HTTP connection
-      this.baseUrl = 'http://141.95.160.10:3001/api';
+      this.baseUrl = 'http://141.95.160.10:3002/api';
       console.log('🌐 Using HTTP - Direct connection to VPS');
     }
     
