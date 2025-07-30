@@ -3,19 +3,7 @@
 
 // API Base URL - using direct configuration to avoid import issues
 const getApiBaseUrl = (): string => {
-  // Check current environment
-  const isLocalhost = window.location.hostname === 'localhost' || 
-                     window.location.hostname === '127.0.0.1' ||
-                     window.location.hostname === '';
-  
-  const isHTTPS = window.location.protocol === 'https:';
-  
-  // For development/testing on same domain
-  if (window.location.port === '3001' || window.location.hostname === '141.95.160.10') {
-    return '/api'; // Relative URL - same server
-  }
-  
-  // Default to VPS HTTP
+  // Direct access to VPS API with port
   return 'http://141.95.160.10:3001/api';
 };
 

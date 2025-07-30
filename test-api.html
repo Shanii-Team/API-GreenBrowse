@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API Connection</title>
+</head>
+<body>
+    <h1>Test de connexion API GreenGrows</h1>
+    <div id="results"></div>
+    
+    <script>
+        const resultsDiv = document.getElementById('results');
+        
+        async function testAPI() {
+            const apiUrl = 'http://localhost:3001/api';
+            
+            try {
+                // Test health endpoint
+                resultsDiv.innerHTML += '<p>🔍 Test de l\'endpoint /health...</p>';
+                const healthResponse = await fetch(`${apiUrl}/health`);
+                const healthData = await healthResponse.json();
+                
+                if (healthResponse.ok) {
+                    resultsDiv.innerHTML += `<p>✅ Health OK: ${JSON.stringify(healthData)}</p>`;
+                } else {
+                    resultsDiv.innerHTML += `<p>❌ Health Error: ${healthResponse.status}</p>`;
+                }
+                
+                // Test stats endpoint  
+                resultsDiv.innerHTML += '<p>🔍 Test de l\'endpoint /stats...</p>';
+                const statsResponse = await fetch(`${apiUrl}/stats`);
+                const statsData = await statsResponse.json();
+                
+                if (statsResponse.ok) {
+                    resultsDiv.innerHTML += `<p>✅ Stats OK: ${JSON.stringify(statsData)}</p>`;
+                } else {
+                    resultsDiv.innerHTML += `<p>❌ Stats Error: ${statsResponse.status}</p>`;
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML += `<p>❌ Erreur de connexion: ${error.message}</p>`;
+            }
+        }
+        
+        // Démarrer le test
+        testAPI();
+    </script>
+</body>
+</html>

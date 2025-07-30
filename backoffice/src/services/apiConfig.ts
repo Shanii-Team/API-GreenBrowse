@@ -9,23 +9,17 @@ export class ApiConfig {
                        window.location.hostname === '127.0.0.1' ||
                        window.location.hostname === '';
     
-    const isHTTPS = window.location.protocol === 'https:';
-    
-    // If we're on HTTPS or deployed, we might need to use a proxy or different URL
-    if (isHTTPS && !isLocalhost) {
-      // Option 1: Use relative URL (same domain)
-      this.baseUrl = '/api';
-      console.log('🔒 Using HTTPS - Using relative API URL');
+    // Use localhost in development, VPS in production
+    if (isLocalhost) {
+      this.baseUrl = 'http://localhost:3001/api';
+      console.log('🌐 Using localhost for development');
     } else {
-      // Option 2: Direct HTTP connection
       this.baseUrl = 'http://141.95.160.10:3001/api';
-      console.log('🌐 Using HTTP - Direct connection to VPS');
+      console.log('🌐 Using VPS for production');
     }
     
     console.log('⚙️ API Configuration:', {
       currentLocation: window.location.href,
-      isHTTPS,
-      isLocalhost,
       apiBaseUrl: this.baseUrl
     });
   }

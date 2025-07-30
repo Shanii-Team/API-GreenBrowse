@@ -12,7 +12,8 @@
       "Bash(npm run dev:all:*)",
       "Bash(node server.js)",
       "Bash(rm:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(npm run backoffice:build:*)"
     ],
     "deny": []
   }

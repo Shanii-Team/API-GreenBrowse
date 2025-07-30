@@ -5,7 +5,7 @@ const path = require('path');
 
 const app = express();
 const port = 3001; // Port configuré dans le client GreenGrowsAPI
-const host = '141.95.160.10'; // Adresse VPS
+const host = process.env.NODE_ENV === 'production' ? '141.95.160.10' : '0.0.0.0'; // VPS en prod, toutes interfaces en dev
 
 // --- CORRECTION SONARQUBE ---
 // Désactive l'en-tête 'X-Powered-By: Express' pour des raisons de sécurité.
