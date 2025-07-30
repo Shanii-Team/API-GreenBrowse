@@ -1,6 +1,7 @@
 import React from 'react';
 import { DivideIcon as LucideIcon } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
+import { getTextSizeClass } from '../utils/formatNumber';
 
 interface RingMetric {
   icon: LucideIcon;
@@ -73,8 +74,8 @@ const RingChart: React.FC<RingChartProps> = ({
           </svg>
           
           {/* Center content */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className={`text-2xl font-bold bg-gradient-to-r ${color} bg-clip-text text-transparent`}>
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
+            <div className={`${getTextSizeClass(centerValue)} font-bold bg-gradient-to-r ${color} bg-clip-text text-transparent text-center leading-tight max-w-full break-words`}>
               {centerValue}
             </div>
             <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">

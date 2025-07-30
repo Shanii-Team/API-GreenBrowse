@@ -17,6 +17,7 @@ import TestDataGenerator from './TestDataGenerator';
 import ConnectionDiagnostic from './ConnectionDiagnostic';
 import RealTimeStats from './RealTimeStats';
 import ActivityFeed from './ActivityFeed';
+import DebugPanel from './DebugPanel';
 
 const Dashboard: React.FC = () => {
   const [timeframe, setTimeframe] = useState('month');
@@ -237,6 +238,9 @@ const Dashboard: React.FC = () => {
 
       {/* Compliance Overview */}
       <ComplianceOverview />
+      
+      {/* Debug Panel - Fixed position */}
+      <DebugPanel />
     </div>
   );
 };

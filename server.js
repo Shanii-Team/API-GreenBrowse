@@ -417,6 +417,107 @@ app.delete('/api/users/:userId', (req, res) => {
     }
 });
 
+// Route de debug pour réinitialiser les logs
+app.post('/api/debug/reset-logs', (req, res) => {
+    try {
+        // Réinitialiser le cache de logs throttling
+        lastLogTime = {};
+        
+        debugLog('info', 'Cache des logs réinitialisé');
+        
+        res.json({
+            success: true,
+            message: 'Cache des logs réinitialisé',
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        debugLog('error', 'Erreur lors de la réinitialisation des logs', {
+            message: error.message,
+            stack: error.stack
+        });
+        res.status(500).json({
+            success: false,
+            error: 'Erreur lors de la réinitialisation des logs'
+        });
+    }
+});
+
+// Route de debug pour réinitialiser toutes les données
+app.post('/api/debug/reset-data', (req, res) => {
+    try {
+        // Sauvegarder les stats avant reset
+        const statsBeforeReset = {
+            users: Object.keys(users).length,
+            totalCO2: totalCO2,
+            dataTypes: Object.keys(details).length
+        };
+        
+        // Réinitialiser toutes les données
+        users = {};
+        totalCO2 = 0;
+        details = {};
+        lastLogTime = {};
+        
+        debugLog('info', 'Toutes les données ont été réinitialisées', statsBeforeReset);
+        
+        res.json({
+            success: true,
+            message: 'Toutes les données ont été réinitialisées',
+            statsBeforeReset,
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        debugLog('error', 'Erreur lors de la réinitialisation des données', {
+            message: error.message,
+            stack: error.stack
+        });
+        res.status(500).json({
+            success: false,
+            error: 'Erreur lors de la réinitialisation des données'
+        });
+    }
+});
+
+// Route de debug pour obtenir les stats serveur
+app.get('/api/debug/stats', (req, res) => {
+    try {
+        const stats = {
+            success: true,
+            data: {
+                server: {
+                    uptime: process.uptime(),
+                    memory: process.memoryUsage(),
+                    version: process.version
+                },
+                data: {
+                    users: Object.keys(users).length,
+                    totalCO2: totalCO2,
+                    dataTypes: Object.keys(details).length,
+                    logCacheSize: Object.keys(lastLogTime).length
+                },
+                users: Object.values(users).map(user => ({
+                    id: user.id,
+                    name: user.profile.name,
+                    totalCO2: user.totalCO2,
+                    typesCount: Object.keys(user.details).length,
+                    lastActivity: user.lastActivity
+                }))
+            }
+        };
+        
+        res.json(stats);
+    } catch (error) {
+        debugLog('error', 'Erreur lors de la récupération des stats de debug', {
+            message: error.message,
+            stack: error.stack
+        });
+        res.status(500).json({
+            success: false,
+            error: 'Erreur lors de la récupération des stats de debug'
+        });
+    }
+});
+
 // Gestion du démarrage du serveur
 const server = app.listen(port, host)
     .on('error', (error) => {

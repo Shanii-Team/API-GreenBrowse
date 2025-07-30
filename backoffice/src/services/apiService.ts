@@ -268,6 +268,61 @@ class ApiService {
   async postCO2DataWithUser(data: CO2Data): Promise<boolean> {
     return this.postCO2Data(data); // Same method, different name for compatibility
   }
+
+  // Debug methods
+  async resetLogs(): Promise<boolean> {
+    try {
+      const response = await this.fetchWithTimeout(`${API_BASE_URL}/debug/reset-logs`, {
+        method: 'POST',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      return result.success;
+    } catch (error) {
+      console.error('❌ Error resetting logs:', error);
+      return false;
+    }
+  }
+
+  async resetData(): Promise<boolean> {
+    try {
+      const response = await this.fetchWithTimeout(`${API_BASE_URL}/debug/reset-data`, {
+        method: 'POST',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      return result.success;
+    } catch (error) {
+      console.error('❌ Error resetting data:', error);
+      return false;
+    }
+  }
+
+  async getDebugStats(): Promise<any> {
+    try {
+      const response = await this.fetchWithTimeout(`${API_BASE_URL}/debug/stats`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('❌ Error fetching debug stats:', error);
+      return {
+        success: false,
+        data: null
+      };
+    }
+  }
 }
 
 export const apiService = new ApiService();
