@@ -3,8 +3,18 @@
 
 // API Base URL - using direct configuration to avoid import issues
 const getApiBaseUrl = (): string => {
-  // Direct access to VPS API with port
-  return 'http://141.95.160.10:3001/api';
+  // Use the same protocol and host as the current page, with /api path
+  // This avoids CORS issues when both backoffice and API are served from same nginx
+  const currentProtocol = window.location.protocol;
+  const currentHost = window.location.host;
+  
+  // If we're on localhost (dev), use the VPS directly
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://141.95.160.10:3001/api';
+  }
+  
+  // Otherwise use relative path (nginx proxy)
+  return '/api';
 };
 
 const API_BASE_URL = getApiBaseUrl();
