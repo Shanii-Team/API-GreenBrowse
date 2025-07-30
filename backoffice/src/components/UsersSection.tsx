@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Users, UserCheck, Trash2, Edit3, Activity, Calendar, Smartphone } from 'lucide-react';
 import { useUsers } from '../hooks/useUsers';
 import { User } from '../services/apiService';
+import { formatNumber } from '../utils/formatNumber';
 
 const UsersSection: React.FC = () => {
   const { users, totalUsers, globalTotal, loading, error, deleteUser, updateUserProfile, refresh } = useUsers();
@@ -62,7 +63,7 @@ const UsersSection: React.FC = () => {
   };
 
   const formatCO2 = (co2: number) => {
-    return co2 < 1 ? `${(co2 * 1000).toFixed(0)} g` : `${co2.toFixed(3)} kg`;
+    return formatNumber(co2, 'co2');
   };
 
   return (

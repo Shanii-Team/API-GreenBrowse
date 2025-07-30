@@ -1,5 +1,6 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, DivideIcon as LucideIcon } from 'lucide-react';
+import { getTextSizeClass } from '../utils/formatNumber';
 
 interface MetricCardProps {
   title: string;
@@ -30,7 +31,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
       </div>
       
       <div className="space-y-2">
-        <div className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">
+        <div className={`${getTextSizeClass(value)} font-bold text-slate-900 dark:text-white break-words leading-tight`}>
           {value}
         </div>
         

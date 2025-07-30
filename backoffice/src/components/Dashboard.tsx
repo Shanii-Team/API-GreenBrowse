@@ -3,6 +3,8 @@ import { TrendingUp, TrendingDown, Users, Coins, Trophy, Activity, Leaf, Target,
 import { Droplets } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 import { useCO2Data } from '../hooks/useCO2Data';
+import { useUsers } from '../hooks/useUsers';
+import { formatNumber } from '../utils/formatNumber';
 import MetricCard from './MetricCard';
 import RingChart from './RingChart';
 import EcosystemCard from './EcosystemCard';
@@ -13,11 +15,14 @@ import WaterSavingsCard from './WaterSavingsCard';
 import CO2BreakdownCard from './CO2BreakdownCard';
 import TestDataGenerator from './TestDataGenerator';
 import ConnectionDiagnostic from './ConnectionDiagnostic';
+import RealTimeStats from './RealTimeStats';
+import ActivityFeed from './ActivityFeed';
 
 const Dashboard: React.FC = () => {
   const [timeframe, setTimeframe] = useState('month');
   const { translate } = useTranslation();
   const { data: co2Data, loading, error, isConnected, hasRealData } = useCO2Data();
+  const { users, totalUsers, globalTotal, loading: usersLoading } = useUsers();
 
   const timeframes = [
     { id: 'today', label: translate('today') },
@@ -28,7 +33,7 @@ const Dashboard: React.FC = () => {
 
   // Use real data if available, otherwise demo data
   const totalCO2 = hasRealData && co2Data.total > 0 ? co2Data.total : 2.847;
-  const totalCO2Display = totalCO2 < 1 ? `${(totalCO2 * 1000).toFixed(0)} gCO₂e` : `${totalCO2.toFixed(3)} kgCO₂e`;
+  const totalCO2Display = formatNumber(totalCO2, 'co2');
   
   // Show data source indicator
   const dataSource = hasRealData ? 'real' : isConnected ? 'empty' : 'demo';
@@ -44,7 +49,7 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'carbon-intensity',
-      value: loading ? 'Loading...' : `${(totalCO2 * 1000).toFixed(1)} g/page`,
+      value: loading ? 'Loading...' : `${formatNumber(totalCO2 * 1000, 'generic')} g/page`,
       change: 8.7,
       isPositive: true,
       icon: Activity,
@@ -157,6 +162,9 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
+      {/* Real-time Statistics */}
+      <RealTimeStats />
+
       {/* Ring Charts */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <RingChart
@@ -172,15 +180,15 @@ const Dashboard: React.FC = () => {
         />
         
         <RingChart
-          title="employee-engagement"
-          centerValue="85%"
+          title="user-engagement"
+          centerValue={usersLoading ? '...' : totalUsers.toString()}
           centerLabel="active-users"
-          progress={85}
-          color="from-orange-500 to-amber-500"
+          progress={Math.min(totalUsers * 10, 100)}
+          color="from-blue-500 to-purple-600"
           metrics={[
-            { icon: Users, label: 'utilisateurs', value: '1,245' },
-            { icon: Coins, label: 'green-coins', value: '45.7k' },
-            { icon: Trophy, label: 'defis-completes', value: '156' }
+            { icon: Users, label: 'utilisateurs-actifs', value: usersLoading ? 'Loading...' : totalUsers.toString() },
+            { icon: Activity, label: 'co2-moyen', value: usersLoading ? 'Loading...' : formatNumber(totalUsers > 0 ? globalTotal / totalUsers : 0, 'co2') },
+            { icon: Trophy, label: 'total-collecte', value: usersLoading ? 'Loading...' : formatNumber(globalTotal, 'co2') }
           ]}
         />
       </div>
@@ -208,12 +216,15 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* CO2 Breakdown */}
-      <CO2BreakdownCard 
-        details={hasRealData ? co2Data.details || {} : { 'webpage': 1.2, 'video': 0.8, 'image': 0.4, 'script': 0.447 }} 
-        total={totalCO2} 
-        loading={loading} 
-      />
+      {/* Activity and CO2 Breakdown */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <CO2BreakdownCard 
+          details={hasRealData ? co2Data.details || {} : { 'webpage': 1.2, 'video': 0.8, 'image': 0.4, 'script': 0.447 }} 
+          total={totalCO2} 
+          loading={loading} 
+        />
+        <ActivityFeed />
+      </div>
 
       {/* API Integration */}
       <ApiIntegration />

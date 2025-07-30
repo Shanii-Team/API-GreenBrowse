@@ -1,5 +1,6 @@
 import React from 'react';
 import { BarChart3, Globe, Zap } from 'lucide-react';
+import { formatNumber } from '../utils/formatNumber';
 
 interface CO2BreakdownCardProps {
   details: Record<string, number>;
@@ -81,7 +82,7 @@ const CO2BreakdownCard: React.FC<CO2BreakdownCardProps> = ({ details, total, loa
       <div className="space-y-4">
         {sortedDetails.map(([type, value], index) => {
           const percentage = total > 0 ? (value / total) * 100 : 0;
-          const displayValue = value < 1 ? `${(value * 1000).toFixed(0)} g` : `${value.toFixed(3)} kg`;
+          const displayValue = formatNumber(value, 'co2').replace('CO₂e', '');
           
           return (
             <div key={type} className="relative">

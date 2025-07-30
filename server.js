@@ -5,7 +5,7 @@ const path = require('path');
 
 const app = express();
 const port = 3001; // Port configuré dans le client GreenGrowsAPI
-const host = process.env.NODE_ENV === 'production' ? '141.95.160.10' : '0.0.0.0'; // VPS en prod, toutes interfaces en dev
+const host = '0.0.0.0'; // Écouter sur toutes les interfaces pour permettre le proxy nginx
 
 // --- CORRECTION SONARQUBE ---
 // Désactive l'en-tête 'X-Powered-By: Express' pour des raisons de sécurité.
@@ -13,13 +13,14 @@ const host = process.env.NODE_ENV === 'production' ? '141.95.160.10' : '0.0.0.0'
 app.disable('x-powered-by');
 // --- FIN CORRECTION ---
 
-// Configuration CORS étendue pour Flutter
+// Configuration CORS optimisée - simplified car nginx gère aussi CORS
 const corsOptions = {
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
     credentials: false,
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200,
+    preflightContinue: false
 };
 
 // Middleware
@@ -73,9 +74,21 @@ function getOrCreateUser(userId) {
     return users[userId];
 }
 
-// Fonction de debug avec formatage amélioré
+// Fonction de debug avec formatage amélioré et limitation
+let lastLogTime = {};
+const LOG_THROTTLE_MS = 5000; // 5 secondes entre les logs similaires
+
 function debugLog(type, message, data = null) {
     const timestamp = new Date().toISOString();
+    const logKey = `${type}-${message}`;
+    const now = Date.now();
+    
+    // Throttle des logs répétitifs (sauf erreurs)
+    if (type !== 'error' && lastLogTime[logKey] && (now - lastLogTime[logKey]) < LOG_THROTTLE_MS) {
+        return;
+    }
+    lastLogTime[logKey] = now;
+    
     let icon = '📝';
     switch (type) {
         case 'success': icon = '✅'; break;
@@ -85,12 +98,16 @@ function debugLog(type, message, data = null) {
         case 'response': icon = '📤'; break;
     }
 
-    console.log('\n' + '-'.repeat(80));
-    console.log(`${icon} [DEBUG API ${timestamp}] ${message}`);
-    if (data) {
-        console.log('Données :', JSON.stringify(data, null, 2));
+    console.log(`${icon} [${timestamp}] ${message}`);
+    if (data && Object.keys(data).length > 0) {
+        // Limite la taille des données loggées
+        const dataStr = JSON.stringify(data, null, 2);
+        if (dataStr.length > 500) {
+            console.log('Données (tronquées):', dataStr.substring(0, 500) + '...');
+        } else {
+            console.log('Données :', dataStr);
+        }
     }
-    console.log('-'.repeat(80) + '\n');
 }
 
 // Middleware de logging des requêtes

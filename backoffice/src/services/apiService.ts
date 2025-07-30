@@ -78,6 +78,8 @@ class ApiService {
     
     try {
       console.log('🔗 Attempting fetch to:', url);
+      console.log('🌐 Current location:', window.location.href);
+      console.log('🎯 API Base URL:', API_BASE_URL);
       
       const response = await fetch(url, {
         ...options,
@@ -101,6 +103,8 @@ class ApiService {
         message: error?.message || 'Unknown error',
         name: error?.name || 'Error',
         url: url,
+        baseUrl: API_BASE_URL,
+        location: window.location.href
       });
       throw error;
     }
