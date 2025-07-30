@@ -1,7 +1,26 @@
 // API Service to connect to GreenGrows API
-import { apiConfig } from './apiConfig';
+// Simplified version to avoid import errors
 
-const API_BASE_URL = apiConfig.getBaseUrl();
+// API Base URL - using direct configuration to avoid import issues
+const getApiBaseUrl = (): string => {
+  // Check current environment
+  const isLocalhost = window.location.hostname === 'localhost' || 
+                     window.location.hostname === '127.0.0.1' ||
+                     window.location.hostname === '';
+  
+  const isHTTPS = window.location.protocol === 'https:';
+  
+  // For development/testing on same domain
+  if (window.location.port === '3001' || window.location.hostname === '141.95.160.10') {
+    return '/api'; // Relative URL - same server
+  }
+  
+  // Default to VPS HTTP
+  return 'http://141.95.160.10:3001/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+console.log('🌐 API Base URL configured:', API_BASE_URL);
 
 export interface CO2Stats {
   success: boolean;
@@ -65,14 +84,12 @@ class ApiService {
       const response = await fetch(url, {
         ...options,
         signal: controller.signal,
-        mode: 'cors', // Explicitly set CORS mode
+        mode: 'cors',
         cache: 'no-cache',
-        credentials: 'omit', // Don't send credentials
-        referrerPolicy: 'no-referrer',
+        credentials: 'omit',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Origin': window.location.origin,
           ...options.headers,
         },
       });
@@ -80,13 +97,12 @@ class ApiService {
       console.log('📡 Response received:', response.status, response.statusText);
       clearTimeout(timeoutId);
       return response;
-    } catch (error) {
+    } catch (error: any) {
       clearTimeout(timeoutId);
       console.error('💥 Fetch error details:', {
-        message: error.message,
-        name: error.name,
+        message: error?.message || 'Unknown error',
+        name: error?.name || 'Error',
         url: url,
-        stack: error.stack?.split('\n')[0]
       });
       throw error;
     }
@@ -109,8 +125,7 @@ class ApiService {
       return result;
     } catch (error) {
       console.error('❌ Error fetching CO2 stats:', error);
-      // Return mock data with error indication if API is unavailable
-      throw error; // Let the calling component handle the error
+      throw error;
     }
   }
 
@@ -135,16 +150,12 @@ class ApiService {
 
   async testConnection(): Promise<boolean> {
     try {
-      // Test with health endpoint first
       const response = await this.fetchWithTimeout(`${API_BASE_URL}/health`);
       if (response.ok) {
         const result = await response.json();
         return result.success === true;
       }
-      
-      // Fallback to stats endpoint
-      const stats = await this.getStats();
-      return stats.success !== false;
+      return false;
     } catch (error) {
       console.error('❌ Connection test failed:', error);
       return false;
@@ -169,7 +180,6 @@ class ApiService {
     }
   }
 
-  // Méthodes pour la gestion des utilisateurs
   async getUsers(): Promise<UsersResponse> {
     try {
       const response = await this.fetchWithTimeout(`${API_BASE_URL}/users`);
@@ -254,22 +264,7 @@ class ApiService {
   }
 
   async postCO2DataWithUser(data: CO2Data): Promise<boolean> {
-    try {
-      const response = await this.fetchWithTimeout(`${API_BASE_URL}/co2`, {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const result = await response.json();
-      return result.success;
-    } catch (error) {
-      console.error('❌ Error posting CO2 data with user:', error);
-      return false;
-    }
+    return this.postCO2Data(data); // Same method, different name for compatibility
   }
 }
 

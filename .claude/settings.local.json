@@ -11,7 +11,8 @@
       "Bash(npm start)",
       "Bash(npm run dev:all:*)",
       "Bash(node server.js)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": []
   }
